@@ -1,3 +1,5 @@
-# Default Community Health Files
+# Community Health Files
 
-More info: [GitHub Docs - Creating a default community health file](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file)
+The default community health files for all my repos on GitHub.
+
+Learn more: [GitHub Docs - Creating a default community health file](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file)
