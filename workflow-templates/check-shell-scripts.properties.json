@@ -2,7 +2,7 @@
   "$schema": "https://www.schemastore.org/github-workflow-template-properties.json",
   "name": "Check Shell Scripts",
   "description": "Check shell scripts using ShellCheck.",
-  "iconName": "octicon terminal",
+  "iconName": "check-shell-scripts",
   "categories": [
     "continuous-integration",
     "code-quality",
