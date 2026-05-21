@@ -1,0 +1,156 @@
+name: Check GitHub Actions Workflows
+
+on:
+  push:
+    branches:
+      - main
+      - 'renovate/**'
+    paths: &paths
+      - '.github/workflows/*.ya?ml'
+
+  pull_request:
+    branches:
+      - main
+    paths: *paths
+
+  workflow_call:
+    inputs: &inputs
+      additional-globs:
+        description: 'Additional, space-separated glob patterns (or files) to check with actionlint.'
+        type: string
+        required: false
+        default: ''
+
+  workflow_dispatch:
+    inputs: *inputs
+
+jobs:
+  code-quality:
+    name: Code Quality
+
+    # TODO: Test ubuntu-slim
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euxo pipefail {0}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up ShellCheck
+        env:
+          # renovate: datasource=github-releases depName=koalaman/shellcheck
+          SHELLCHECK_VERSION: v0.11.0
+        run: |
+          # Check if ShellCheck is already cached.
+          shellcheck_cache_dir="${RUNNER_TOOL_CACHE}/shellcheck/${SHELLCHECK_VERSION#v}/x64"
+          shellcheck_cache_complete="${shellcheck_cache_dir}.complete"
+          if [[ ! -f "${shellcheck_cache_complete}" ]]; then
+            # Create a temporary download directory.
+            download_dir="$(mktemp -d -p "${RUNNER_TEMP}")"
+
+            # Download the ShellCheck archive.
+            shellcheck_archive_download="${download_dir}/shellcheck.tar.xz"
+            curl \
+              --fail \
+              --silent \
+              --show-error \
+              --location \
+              "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" \
+              --output "${shellcheck_archive_download}"
+
+            # Clean up any existing cache files.
+            if [[ -d "${shellcheck_cache_dir}" ]]; then
+              rm -rf "${shellcheck_cache_dir}"
+            fi
+            mkdir -p "${shellcheck_cache_dir}"
+
+            # Extract the ShellCheck binary from the archive into the cache directory.
+            tar \
+              --extract \
+              --warning 'no-unknown-keyword' \
+              --auto-compress \
+              --file "${shellcheck_archive_download}" \
+              --overwrite \
+              --directory "${shellcheck_cache_dir}" \
+              --strip-components 1 \
+              "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
+
+            # Finalize the binary and add it to the PATH.
+            chmod +x "${shellcheck_cache_dir}/shellcheck"
+            echo "${shellcheck_cache_dir}" >> "${GITHUB_PATH}"
+
+            # Mark the ShellCheck cache as complete.
+            echo '' > "${shellcheck_cache_complete}"
+          fi
+
+      - name: Set up actionlint
+        env:
+          # renovate: datasource=github-releases depName=rhysd/actionlint
+          ACTIONLINT_VERSION: v1.7.12
+        run: |
+          # Create a temporary download directory.
+          download_dir="$(mktemp -d -p "${RUNNER_TEMP}")"
+
+          # Check if actionlint is already cached.
+          actionlint_cache_dir="${RUNNER_TOOL_CACHE}/actionlint/${ACTIONLINT_VERSION#v}/x64"
+          actionlint_cache_complete="${actionlint_cache_dir}.complete"
+          if [[ ! -f "${actionlint_cache_complete}" ]]; then
+            # Download the actionlint archive.
+            actionlint_archive_download="${download_dir}/actionlint.tar.gz"
+            curl \
+              --fail \
+              --silent \
+              --show-error \
+              --location \
+              "https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION#v}_linux_amd64.tar.gz" \
+              --output "${actionlint_archive_download}"
+
+            # Clean up any existing cache files.
+            if [[ -d "${actionlint_cache_dir}" ]]; then
+              rm -rf "${actionlint_cache_dir}"
+            fi
+            mkdir -p "${actionlint_cache_dir}"
+
+            # Extract the actionlint binary from the archive into the cache directory.
+            tar \
+              --extract \
+              --warning 'no-unknown-keyword' \
+              --auto-compress \
+              --file "${actionlint_archive_download}" \
+              --overwrite \
+              --directory "${actionlint_cache_dir}" \
+              'actionlint'
+
+            # Finalize the binary and add it to the PATH.
+            chmod +x "${actionlint_cache_dir}/actionlint"
+            echo "${actionlint_cache_dir}" >> "${GITHUB_PATH}"
+
+            # Mark the actionlint cache as complete.
+            echo '' > "${actionlint_cache_complete}"
+          fi
+
+          # Download the actionlint problem matcher.
+          actionlint_problem_matcher_download="${download_dir}/actionlint-problem-matcher.json"
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            "https://raw.githubusercontent.com/rhysd/actionlint/refs/tags/${ACTIONLINT_VERSION}/.github/actionlint-matcher.json" \
+            --output "${actionlint_problem_matcher_download}"
+
+          # Register the actionlint problem matcher.
+          echo "::add-matcher::${actionlint_problem_matcher_download}"
+
+      - name: Run actionlint
+        env:
+          # Enable all optional checks for shellcheck.
+          # Note that some are still explicitly excluded by actionlint.
+          SHELLCHECK_OPTS: --enable=all
+        # Technically "shellcheck" is the default, but we explicitly set it anyway.
+        # We disable pyflakes because we're not using it at the moment.
+        run: actionlint -verbose -color -shellcheck=shellcheck -pyflakes='' ${{ inputs.additional-globs }}
