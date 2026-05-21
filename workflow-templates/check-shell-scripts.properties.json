@@ -1,0 +1,15 @@
+{
+  "$schema": "https://www.schemastore.org/github-workflow-template-properties.json",
+  "name": "Check Shell Scripts",
+  "description": "Check shell scripts using ShellCheck.",
+  "iconName": "octicon terminal",
+  "categories": [
+    "continuous-integration",
+    "code-quality",
+    "shell-script"
+  ],
+  "filePatterns": [
+    ".*\\.(?:ash|bash|bats|dash|ksh|sh)$",
+    "$.githooks\/.*"
+  ]
+}

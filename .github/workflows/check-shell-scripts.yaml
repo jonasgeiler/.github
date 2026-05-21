@@ -25,7 +25,7 @@ on:
   workflow_call:
     inputs: &inputs
       additional-globs:
-        description: 'Additional, space-separated glob patterns (or files) to check with shellcheck.'
+        description: 'Additional, space-separated glob patterns (or files) to check with ShellCheck.'
         type: string
         required: false
         default: ''
@@ -49,7 +49,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up shellcheck
+      - name: Set up ShellCheck
         env:
           # renovate: datasource=github-releases depName=koalaman/shellcheck
           SHELLCHECK_VERSION: v0.11.0
@@ -59,11 +59,11 @@ jobs:
           # Create a temporary download directory.
           download_dir="$(mktemp -d -p "${RUNNER_TEMP}")"
 
-          # Check if shellcheck is already cached.
+          # Check if ShellCheck is already cached.
           shellcheck_cache_dir="${RUNNER_TOOL_CACHE}/shellcheck/${SHELLCHECK_VERSION#v}/x64"
           shellcheck_cache_complete="${shellcheck_cache_dir}.complete"
           if [[ ! -f "${shellcheck_cache_complete}" ]]; then
-            # Download the shellcheck archive.
+            # Download the ShellCheck archive.
             shellcheck_archive_download="${download_dir}/shellcheck.tar.xz"
             curl \
               --fail \
@@ -79,7 +79,7 @@ jobs:
             fi
             mkdir -p "${shellcheck_cache_dir}"
 
-            # Extract the shellcheck binary from the archive into the cache directory.
+            # Extract the ShellCheck binary from the archive into the cache directory.
             tar \
               --extract \
               --warning 'no-unknown-keyword' \
@@ -94,11 +94,11 @@ jobs:
             chmod +x "${shellcheck_cache_dir}/shellcheck"
             echo "${shellcheck_cache_dir}" >> "${GITHUB_PATH}"
 
-            # Mark the shellcheck cache as complete.
+            # Mark the ShellCheck cache as complete.
             echo '' > "${shellcheck_cache_complete}"
           fi
 
-          # Download the shellcheck problem matcher.
+          # Download the ShellCheck problem matcher.
           shellcheck_problem_matcher_download="${download_dir}/shellcheck-problem-matcher.json"
           curl \
             --fail \
@@ -108,10 +108,10 @@ jobs:
             "https://raw.githubusercontent.com/lumaxis/shellcheck-problem-matchers/refs/tags/${SHELLCHECK_PROBLEM_MATCHERS_VERSION}/.github/shellcheck-gcc.json" \
             --output "${shellcheck_problem_matcher_download}"
 
-          # Register the shellcheck problem matcher.
+          # Register the ShellCheck problem matcher.
           echo "::add-matcher::${shellcheck_problem_matcher_download}"
 
-      - name: Run shellcheck
+      - name: Run ShellCheck
         run: |
           # Support advanced globbing patterns.
           shopt -s dotglob globstar nullglob
