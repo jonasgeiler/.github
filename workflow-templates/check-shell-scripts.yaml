@@ -1,0 +1,33 @@
+name: Check Shell Scripts
+
+on:
+  push:
+    branches:
+      - $default-branch
+      - 'renovate/**'
+    paths: &paths
+      - '**.ash'
+      - '**.bash'
+      - '**.bats'
+      - '**.dash'
+      - '**.ksh'
+      - '**.sh'
+      - '.githooks/*'
+
+      - .github/workflows/check-shell-scripts.yaml
+
+  pull_request:
+    branches:
+      - $default-branch
+    paths: *paths
+
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  _:
+    uses: jonasgeiler/.github/.github/workflows/check-shell-scripts.yaml@main
+    with:
+      additional-globs: >-
+        myscript
+        myotherscript
