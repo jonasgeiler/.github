@@ -15,7 +15,7 @@ on:
       - '.githooks/*'
 
       # Currently fails in the ".github" repo because no shell scripts exist.
-      #- .github/workflows/check-shell-scripts.yaml
+      #- .github/workflows/check-shell-scripts.ya?ml
 
   pull_request:
     branches:
@@ -34,7 +34,7 @@ on:
     inputs: *inputs
 
 jobs:
-  code-quality: ################################################################
+  code-quality:
     name: Code Quality
 
     # We are using ubuntu-slim because it is a really fast little job.

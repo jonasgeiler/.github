@@ -14,7 +14,7 @@ on:
       - '**.sh'
       - '.githooks/*'
 
-      - .github/workflows/check-shell-scripts.yaml
+      - .github/workflows/check-shell-scripts.ya?ml
 
   pull_request:
     branches:
