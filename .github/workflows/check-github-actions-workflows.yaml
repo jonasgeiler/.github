@@ -15,8 +15,8 @@ on:
 
   workflow_call:
     inputs: &inputs
-      additional-globs:
-        description: 'Additional, space-separated glob patterns (or files) to check with actionlint.'
+      globs:
+        description: 'Space-separated glob patterns (or files) to check with actionlint, instead of the default ones.'
         type: string
         required: false
         default: ''
@@ -151,6 +151,11 @@ jobs:
           # Enable all optional checks for shellcheck.
           # Note that some are still explicitly excluded by actionlint.
           SHELLCHECK_OPTS: --enable=all
-        # Technically "shellcheck" is the default, but we explicitly set it anyway.
-        # We disable pyflakes because we're not using it at the moment.
-        run: actionlint -verbose -color -shellcheck=shellcheck -pyflakes='' ${{ inputs.additional-globs }}
+        run: |
+          # Support advanced globbing patterns.
+          shopt -s dotglob globstar nullglob
+
+          # We use verbose mode to see which files are checked.
+          # Technically "shellcheck" is the default, but we explicitly set it anyway.
+          # We disable pyflakes because we're not using it at the moment.
+          actionlint -verbose -color -shellcheck=shellcheck -pyflakes='' ${{ inputs.globs }}
