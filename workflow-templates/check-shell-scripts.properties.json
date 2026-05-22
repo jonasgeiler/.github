@@ -8,6 +8,6 @@
   ],
   "filePatterns": [
     ".*\\.(?:ash|bash|bats|dash|ksh|sh)$",
-    "$.githooks\/.*"
+    "^\\.githooks\\/.*$"
   ]
 }
