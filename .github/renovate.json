@@ -1,4 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>jonasgeiler/renovate-config"]
+  "extends": ["github>jonasgeiler/renovate-config"],
+  "packageRules": [
+    {
+      "matchFileNames": ["/^workflow-templates\\/.*\\.ya?ml$/"],
+      "enabled": false
+    }
+  ]
 }

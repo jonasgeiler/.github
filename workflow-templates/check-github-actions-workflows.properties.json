@@ -7,7 +7,7 @@
     "YAML"
   ],
   "filePatterns": [
-    "^\\.github\\/workflows\\/.*\\.(?:yml|yaml)$",
-    "^workflow-templates\\/.*\\.(?:yml|yaml)$"
+    "^\\.github\\/workflows\\/.*\\.ya?ml$",
+    "^workflow-templates\\/.*\\.ya?ml$"
   ]
 }
