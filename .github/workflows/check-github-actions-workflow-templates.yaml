@@ -1,0 +1,28 @@
+name: Check GitHub Actions Workflow Templates
+# Note that this file does not have a template in "/workflow-templates", since
+# it's really only useful in this repository.
+
+on:
+  push:
+    branches:
+      - main
+      - 'renovate/**'
+    paths: &paths
+      - 'workflow-templates/*.ya?ml'
+
+      - .github/workflows/check-github-actions-workflow-templates.ya?ml
+
+  pull_request:
+    branches:
+      - main
+    paths: *paths
+
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  _:
+    uses: ./.github/workflows/check-github-actions-workflows.yaml
+    with:
+      globs: >-
+        workflow-templates/*.{yml,yaml}
