@@ -88,14 +88,14 @@ jobs:
               --directory "${shellcheck_cache_dir}" \
               --strip-components 1 \
               "shellcheck-${SHELLCHECK_VERSION}/shellcheck"
-
-            # Finalize the binary and add it to the PATH.
             chmod +x "${shellcheck_cache_dir}/shellcheck"
-            echo "${shellcheck_cache_dir}" >> "${GITHUB_PATH}"
 
             # Mark the ShellCheck cache as complete.
             echo '' > "${shellcheck_cache_complete}"
           fi
+
+          # Add ShellCheck to the PATH.
+          echo "${shellcheck_cache_dir}" >> "${GITHUB_PATH}"
 
           # Download the ShellCheck problem matcher.
           shellcheck_problem_matcher="${download_dir}/shellcheck-problem-matcher.json"
