@@ -53,14 +53,14 @@ jobs:
             download_dir="$(mktemp -d -p "${RUNNER_TEMP}")"
 
             # Download the ShellCheck archive.
-            shellcheck_archive_download="${download_dir}/shellcheck.tar.xz"
+            shellcheck_archive="${download_dir}/shellcheck.tar.xz"
             curl \
               --fail \
               --silent \
               --show-error \
               --location \
               "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" \
-              --output "${shellcheck_archive_download}"
+              --output "${shellcheck_archive}"
 
             # Clean up any existing cache files.
             if [[ -d "${shellcheck_cache_dir}" ]]; then
@@ -73,7 +73,7 @@ jobs:
               --extract \
               --warning 'no-unknown-keyword' \
               --auto-compress \
-              --file "${shellcheck_archive_download}" \
+              --file "${shellcheck_archive}" \
               --overwrite \
               --directory "${shellcheck_cache_dir}" \
               --strip-components 1 \
@@ -100,14 +100,14 @@ jobs:
           actionlint_cache_complete="${actionlint_cache_dir}.complete"
           if [[ ! -f "${actionlint_cache_complete}" ]]; then
             # Download the actionlint archive.
-            actionlint_archive_download="${download_dir}/actionlint.tar.gz"
+            actionlint_archive="${download_dir}/actionlint.tar.gz"
             curl \
               --fail \
               --silent \
               --show-error \
               --location \
               "https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION#v}_linux_amd64.tar.gz" \
-              --output "${actionlint_archive_download}"
+              --output "${actionlint_archive}"
 
             # Clean up any existing cache files.
             if [[ -d "${actionlint_cache_dir}" ]]; then
@@ -120,7 +120,7 @@ jobs:
               --extract \
               --warning 'no-unknown-keyword' \
               --auto-compress \
-              --file "${actionlint_archive_download}" \
+              --file "${actionlint_archive}" \
               --overwrite \
               --directory "${actionlint_cache_dir}" \
               'actionlint'
@@ -134,17 +134,17 @@ jobs:
           fi
 
           # Download the actionlint problem matcher.
-          actionlint_problem_matcher_download="${download_dir}/actionlint-problem-matcher.json"
+          actionlint_problem_matcher="${download_dir}/actionlint-problem-matcher.json"
           curl \
             --fail \
             --silent \
             --show-error \
             --location \
             "https://raw.githubusercontent.com/rhysd/actionlint/refs/tags/${ACTIONLINT_VERSION}/.github/actionlint-matcher.json" \
-            --output "${actionlint_problem_matcher_download}"
+            --output "${actionlint_problem_matcher}"
 
           # Register the actionlint problem matcher.
-          echo "::add-matcher::${actionlint_problem_matcher_download}"
+          echo "::add-matcher::${actionlint_problem_matcher}"
 
       - name: Run actionlint
         env:

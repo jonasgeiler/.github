@@ -63,14 +63,14 @@ jobs:
           shellcheck_cache_complete="${shellcheck_cache_dir}.complete"
           if [[ ! -f "${shellcheck_cache_complete}" ]]; then
             # Download the ShellCheck archive.
-            shellcheck_archive_download="${download_dir}/shellcheck.tar.xz"
+            shellcheck_archive="${download_dir}/shellcheck.tar.xz"
             curl \
               --fail \
               --silent \
               --show-error \
               --location \
               "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" \
-              --output "${shellcheck_archive_download}"
+              --output "${shellcheck_archive}"
 
             # Clean up any existing cache files.
             if [[ -d "${shellcheck_cache_dir}" ]]; then
@@ -83,7 +83,7 @@ jobs:
               --extract \
               --warning 'no-unknown-keyword' \
               --auto-compress \
-              --file "${shellcheck_archive_download}" \
+              --file "${shellcheck_archive}" \
               --overwrite \
               --directory "${shellcheck_cache_dir}" \
               --strip-components 1 \
@@ -98,17 +98,17 @@ jobs:
           fi
 
           # Download the ShellCheck problem matcher.
-          shellcheck_problem_matcher_download="${download_dir}/shellcheck-problem-matcher.json"
+          shellcheck_problem_matcher="${download_dir}/shellcheck-problem-matcher.json"
           curl \
             --fail \
             --silent \
             --show-error \
             --location \
             "https://raw.githubusercontent.com/lumaxis/shellcheck-problem-matchers/refs/tags/${SHELLCHECK_PROBLEM_MATCHERS_VERSION}/.github/shellcheck-gcc.json" \
-            --output "${shellcheck_problem_matcher_download}"
+            --output "${shellcheck_problem_matcher}"
 
           # Register the ShellCheck problem matcher.
-          echo "::add-matcher::${shellcheck_problem_matcher_download}"
+          echo "::add-matcher::${shellcheck_problem_matcher}"
 
       - name: Run ShellCheck
         run: |
