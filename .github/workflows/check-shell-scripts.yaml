@@ -118,7 +118,7 @@ jobs:
 
           # We have to use gcc format and disable colors for the problem matcher.
           # The additional-globs are injected as-is, so each is an argument.
-          shellcheck --norc --format=gcc --color=never \
+          shellcheck --enable=all --norc --format=gcc --color=never \
             ${{ inputs.additional-globs }} \
             ./**/*.{ash,bash,bats,dash,ksh,sh} \
             .githooks/*
