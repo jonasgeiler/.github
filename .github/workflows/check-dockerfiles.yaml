@@ -97,6 +97,7 @@ jobs:
           # Support advanced globbing patterns.
           shopt -s dotglob globstar nullglob
 
+          # By default only "info" and above are counted as failures.
           # The additional-globs are injected as-is, so each is an argument.
           hadolint --failure-threshold=style \
             ${{ inputs.additional-globs }} \
