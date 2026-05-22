@@ -5,6 +5,10 @@
     {
       "matchFileNames": ["/^workflow-templates\\/.*\\.ya?ml$/"],
       "enabled": false
+    },
+    {
+      "matchFileNames": ["/^\\.github\\/test-files\\/test\\.Dockerfile$/"],
+      "extends": [":automergeAll"]
     }
   ]
 }
