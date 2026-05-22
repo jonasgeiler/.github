@@ -92,13 +92,14 @@ jobs:
           # renovate: datasource=github-releases depName=rhysd/actionlint
           ACTIONLINT_VERSION: v1.7.12
         run: |
-          # Create a temporary download directory.
-          download_dir="$(mktemp -d -p "${RUNNER_TEMP}")"
-
           # Check if actionlint is already cached.
           actionlint_cache_dir="${RUNNER_TOOL_CACHE}/actionlint/${ACTIONLINT_VERSION#v}/x64"
           actionlint_cache_complete="${actionlint_cache_dir}.complete"
+          actionlint_problem_matcher="${actionlint_cache_dir}/actionlint-problem-matcher.json"
           if [[ ! -f "${actionlint_cache_complete}" ]]; then
+            # Create a temporary download directory.
+            download_dir="$(mktemp -d -p "${RUNNER_TEMP}")"
+
             # Download the actionlint archive.
             actionlint_archive="${download_dir}/actionlint.tar.gz"
             curl \
@@ -124,24 +125,23 @@ jobs:
               --overwrite \
               --directory "${actionlint_cache_dir}" \
               'actionlint'
-
-            # Finalize the binary and add it to the PATH.
             chmod +x "${actionlint_cache_dir}/actionlint"
-            echo "${actionlint_cache_dir}" >> "${GITHUB_PATH}"
+
+            # Download the actionlint problem matcher.
+            curl \
+              --fail \
+              --silent \
+              --show-error \
+              --location \
+              "https://raw.githubusercontent.com/rhysd/actionlint/refs/tags/${ACTIONLINT_VERSION}/.github/actionlint-matcher.json" \
+              --output "${actionlint_problem_matcher}"
 
             # Mark the actionlint cache as complete.
             echo '' > "${actionlint_cache_complete}"
           fi
 
-          # Download the actionlint problem matcher.
-          actionlint_problem_matcher="${download_dir}/actionlint-problem-matcher.json"
-          curl \
-            --fail \
-            --silent \
-            --show-error \
-            --location \
-            "https://raw.githubusercontent.com/rhysd/actionlint/refs/tags/${ACTIONLINT_VERSION}/.github/actionlint-matcher.json" \
-            --output "${actionlint_problem_matcher}"
+          # Add actionlint to the PATH.
+          echo "${actionlint_cache_dir}" >> "${GITHUB_PATH}"
 
           # Register the actionlint problem matcher.
           echo "::add-matcher::${actionlint_problem_matcher}"
