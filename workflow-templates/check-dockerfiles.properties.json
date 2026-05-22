@@ -1,0 +1,13 @@
+{
+  "$schema": "https://www.schemastore.org/github-workflow-template-properties.json",
+  "name": "Check Dockerfiles",
+  "description": "Set up and run Hadolint.",
+  "iconName": "check-dockerfiles",
+  "categories": [
+    "Dockerfile"
+  ],
+  "filePatterns": [
+    "(?:^|\\/)Dockerfile$",
+    "(?:^|\\/).*\\.Dockerfile$"
+  ]
+}

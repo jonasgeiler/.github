@@ -1,0 +1,28 @@
+name: Check Dockerfiles
+
+on:
+  push:
+    branches:
+      - $default-branch
+      - 'renovate/**'
+    paths: &paths
+      - '**/Dockerfile'
+      - '**.Dockerfile'
+
+      - .github/workflows/check-dockerfiles.ya?ml
+
+  pull_request:
+    branches:
+      - $default-branch
+    paths: *paths
+
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  _:
+    uses: jonasgeiler/.github/.github/workflows/check-dockerfiles.yaml@main
+    with:
+      additional-globs: >-
+        ./**/Containerfile
+        ./**/*.Containerfile
