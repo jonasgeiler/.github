@@ -1,0 +1,104 @@
+name: Check Dockerfiles
+
+on:
+  push:
+    branches:
+      - main
+      - 'renovate/**'
+    paths: &paths
+      - '**/Dockerfile'
+      - '**.Dockerfile'
+
+      - .github/workflows/check-dockerfiles.ya?ml
+
+  pull_request:
+    branches:
+      - main
+    paths: *paths
+
+  workflow_call:
+    inputs: &inputs
+      additional-globs:
+        description: 'Additional, space-separated glob patterns (or files) to check with Hadolint.'
+        type: string
+        required: false
+        default: ''
+
+  workflow_dispatch:
+    inputs: *inputs
+
+jobs:
+  code-quality:
+    name: Code Quality
+
+    # TODO: Try ubuntu-slim
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euxo pipefail {0}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Hadolint
+        env:
+          # renovate: datasource=github-releases depName=hadolint/hadolint
+          HADOLINT_VERSION: v2.14.0
+        run: |
+          # Check if Hadolint is already cached.
+          hadolint_cache_dir="${RUNNER_TOOL_CACHE}/hadolint/${HADOLINT_VERSION#v}/x64"
+          hadolint_cache_complete="${hadolint_cache_dir}.complete"
+          if [[ ! -f "${hadolint_cache_complete}" ]]; then
+            # Clean up any existing cache files.
+            if [[ -d "${hadolint_cache_dir}" ]]; then
+              rm -rf "${hadolint_cache_dir}"
+            fi
+            mkdir -p "${hadolint_cache_dir}"
+
+            # Download the Hadolint binary.
+            hadolint_binary="${hadolint_cache_dir}/hadolint"
+            curl \
+              --fail \
+              --silent \
+              --show-error \
+              --location \
+              "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-linux-x86_64" \
+              --output "${hadolint_binary}"
+            chmod +x "${hadolint_binary}"
+
+            # Mark the Hadolint cache as complete.
+            echo '' > "${hadolint_cache_complete}"
+          fi
+
+          # Add Hadolint to the PATH.
+          echo "${hadolint_cache_dir}" >> "${GITHUB_PATH}"
+
+          # Create a temporary download directory.
+          download_dir="$(mktemp -d -p "${RUNNER_TEMP}")"
+
+          # Download the Hadolint problem matcher.
+          hadolint_problem_matcher="${download_dir}/hadolint-problem-matcher.json"
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            "https://raw.githubusercontent.com/jonasgeiler/hadolint-action/patch-1/problem-matcher.json" \
+            --output "${hadolint_problem_matcher}"
+
+          # Register the Hadolint problem matcher.
+          echo "::add-matcher::${hadolint_problem_matcher}"
+
+      - name: Run Hadolint
+        run: |
+          # Support advanced globbing patterns.
+          shopt -s dotglob globstar nullglob
+
+          # The additional-globs are injected as-is, so each is an argument.
+          hadolint --failure-threshold=style \
+            ${{ inputs.additional-globs }} \
+            ./**/Dockerfile \
+            ./**/*.Dockerfile
