@@ -28,8 +28,8 @@ jobs:
   code-quality:
     name: Code Quality
 
-    # TODO: Test ubuntu-slim
-    runs-on: ubuntu-latest
+    # We are using ubuntu-slim because it is a really fast little job.
+    runs-on: ubuntu-slim
     defaults:
       run:
         shell: bash --noprofile --norc -euxo pipefail {0}
