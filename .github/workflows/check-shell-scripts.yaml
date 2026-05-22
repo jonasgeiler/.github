@@ -14,8 +14,7 @@ on:
       - '**.sh'
       - '.githooks/*'
 
-      # Currently fails in the ".github" repo because no shell scripts exist.
-      #- .github/workflows/check-shell-scripts.ya?ml
+      - .github/workflows/check-shell-scripts.ya?ml
 
   pull_request:
     branches:
