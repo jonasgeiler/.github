@@ -1,0 +1,13 @@
+{
+  "$schema": "https://www.schemastore.org/github-workflow-template-properties.json",
+  "name": "Check GitHub Actions Workflows",
+  "description": "Set up and run actionlint.",
+  "iconName": "octicons play",
+  "categories": [
+    "YAML"
+  ],
+  "filePatterns": [
+    "^\\.github\\/workflows\\/.*\\.(?:yml|yaml)$",
+    "^workflow-templates\\/.*\\.(?:yml|yaml)$"
+  ]
+}
