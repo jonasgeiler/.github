@@ -15,7 +15,7 @@ on:
 
   workflow_call:
     inputs: &inputs
-      globs:
+      override-globs:
         description: 'Space-separated glob patterns (or files) to check with actionlint, instead of the default ones.'
         type: string
         required: false
@@ -158,4 +158,4 @@ jobs:
           # We use verbose mode to see which files are checked.
           # Technically "shellcheck" is the default, but we explicitly set it anyway.
           # We disable pyflakes because we're not using it at the moment.
-          actionlint -verbose -color -shellcheck=shellcheck -pyflakes='' ${{ inputs.globs }}
+          actionlint -verbose -color -shellcheck=shellcheck -pyflakes='' ${{ inputs.override-globs }}

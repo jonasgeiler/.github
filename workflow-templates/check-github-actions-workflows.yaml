@@ -20,6 +20,6 @@ jobs:
   _:
     uses: jonasgeiler/.github/.github/workflows/check-github-actions-workflows.yaml@main
     with:
-      globs: >-
+      override-globs: >-
         workflow-templates/*.{yml,yaml}
         action.{yml,yaml}

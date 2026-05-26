@@ -24,5 +24,5 @@ jobs:
   _:
     uses: ./.github/workflows/check-github-actions-workflows.yaml
     with:
-      globs: >-
+      override-globs: >-
         workflow-templates/*.{yml,yaml}
