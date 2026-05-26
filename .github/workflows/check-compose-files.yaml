@@ -1,0 +1,71 @@
+name: Check Compose Files
+
+on:
+  push:
+    branches:
+      - main
+      - 'renovate/**'
+    paths: &paths
+      - '**/compose.ya?ml'
+      - '**/docker-compose.ya?ml'
+
+      - .github/workflows/check-compose-files.ya?ml
+
+  pull_request:
+    branches:
+      - main
+    paths: *paths
+
+  workflow_call:
+    inputs: &inputs
+      globs:
+        description: 'Space-separated glob patterns (or files) to check with "docker compose config".'
+        type: string
+        required: false
+        # If you change the default, also change it in the run-step below.
+        default: './**/compose.{yml,yaml} ./**/docker-compose.{yml,yaml}'
+
+  workflow_dispatch:
+    inputs: *inputs
+
+jobs:
+  code-quality:
+    name: Code Quality
+
+    # We are using ubuntu-slim because it is a really fast little job.
+    runs-on: ubuntu-slim
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euxo pipefail {0}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Compose plugin
+        env:
+          # renovate: datasource=github-releases depName=docker/compose
+          DOCKER_COMPOSE_VERSION: v5.1.4
+        run: |
+          # Download the Docker Compose plugin binary and replace the old one.
+          compose_plugin_path="$(docker info --format='{{range .ClientInfo.Plugins}}{{if eq .Name "compose"}}{{.Path}}{{break}}{{end}}{{end}}')"
+          sudo curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" \
+            --output "${compose_plugin_path}"
+
+      - name: Run "docker compose config"
+        run: |
+          # Support advanced globbing patterns.
+          shopt -s dotglob globstar nullglob
+
+          # Gather all files in an array and run config validation on each.
+          files=(${{ inputs.globs || './**/compose.{yml,yaml} ./**/docker-compose.{yml,yaml}' }})
+          for file in "${files[@]}"; do
+            docker compose -f "${file}" config --quiet --no-interpolate
+          done

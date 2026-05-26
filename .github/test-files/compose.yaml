@@ -1,0 +1,13 @@
+name: test
+
+networks:
+  main:
+
+services:
+  crond:
+    image: alpine:3.23.4
+    command: ['crond', '-f', '-d8']
+    init: true
+    restart: unless-stopped
+    networks:
+      - main
