@@ -1,0 +1,28 @@
+name: Check Compose Files
+
+on:
+  push:
+    branches:
+      - $default-branch
+      - 'renovate/**'
+    paths: &paths
+      - '**/compose.ya?ml'
+      - '**/docker-compose.ya?ml'
+
+      - .github/workflows/check-compose-files.ya?ml
+
+  pull_request:
+    branches:
+      - $default-branch
+    paths: *paths
+
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  _:
+    uses: jonasgeiler/.github/.github/workflows/check-compose-files.yaml@main
+    with:
+      globs: >-
+        ./**/test-compose.{yml,yaml}
+        ./**/compose.production.{yml,yaml}

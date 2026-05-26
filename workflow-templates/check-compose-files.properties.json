@@ -1,0 +1,12 @@
+{
+  "$schema": "https://www.schemastore.org/github-workflow-template-properties.json",
+  "name": "Check Compose Files",
+  "description": "Set up Docker Compose plugin and run \"docker compose config\".",
+  "iconName": "check-compose-files",
+  "categories": [
+    "YAML"
+  ],
+  "filePatterns": [
+    "(?:^|\\/)(?:docker-)?compose.ya?ml$"
+  ]
+}
