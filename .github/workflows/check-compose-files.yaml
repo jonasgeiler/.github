@@ -47,7 +47,7 @@ jobs:
       - name: Set up Docker Compose plugin
         env:
           # renovate: datasource=github-releases depName=docker/compose
-          DOCKER_COMPOSE_VERSION: v5.1.4
+          DOCKER_COMPOSE_VERSION: v5.2.0
         run: |
           # Download the Docker Compose plugin binary and replace the old one.
           compose_plugin_path="$(docker info --format='{{range .ClientInfo.Plugins}}{{if eq .Name "compose"}}{{.Path}}{{break}}{{end}}{{end}}')"
