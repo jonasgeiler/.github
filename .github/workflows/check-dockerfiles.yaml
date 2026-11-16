@@ -46,7 +46,7 @@ jobs:
       - name: Set up Hadolint
         env:
           # renovate: datasource=github-releases depName=hadolint/hadolint
-          HADOLINT_VERSION: v2.14.0
+          HADOLINT_VERSION: v2.15.1
         run: |
           # Check if Hadolint is already cached.
           hadolint_cache_dir="${RUNNER_TOOL_CACHE}/hadolint/${HADOLINT_VERSION#v}/x64"
